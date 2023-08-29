@@ -1,63 +1,32 @@
-# Meaningful title for the repository
-*pick type of repository (TOOL, ETL, ANALYSIS, ADMIN)*
+# Exploration of the EDH dataset for the purpose of SNA creation and analysis
 
----
+## About
+This repository aims to use the existing EDH dataset to create past social networks from inscriptions as part of the Past Social Network project.
 
-## Purpose
-[In two to three sentences state the purpose of this repository, ideally tying it to an existing SDAM milestone. E.g., The purpose of this repository is to provide templates for all future SDAM repositories in order to save precious time and maintain high standards and uniformity of our documentation.]
-
----
 ## Authors
-* Petra Hermankova [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0002-6349-0540), SDAM project, petra@ancientsocialcomplexity.org
-* [Name], [ORCID], [Institution], [email]
-* [Name], [ORCID], [Institution], [email]
-* [Name], [ORCID], [Institution], [email]
+* Petra Hermankova [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0002-6349-0540)
+* [Name], [ORCID], [Institution]
 
 ## License
 CC-BY-SA 4.0, see attached License.md
 
-## DOI
-[Here will be DOI or some other identifier once we have it]
-
-### References
-[Here will go related articles or other sources we will publish/create]
-
 ---
-# How to use this repository
-
-## Sources and prerequisites
-[Describe the provenance of data used in the scripts contained and clarify how it is harvested and what other prerequisites are required to get the scripts working. In case of pure tool attribute any reused scripts to source, etc., license and specify any prerequisites or technical requirements.]
 
 ### Data
-Anything else on data metadata and data used. Link to data repository or explanatory article. 
+**EDH dataset**
 
-### Software
-1. Software X, minimum version 123
-1. Software Y, version 456
+**DATASET 2022**: `Heřmánková, Petra, & Kaše, Vojtěch. (2022). EDH_text_cleaned_2022_11_03 (v2.0) [Data set]. Zenodo. http://doi.org/10.5281/zenodo.7303886 http://doi.org/10.5281/zenodo.7303886`
 
-### Registered account
-1. CompanyA
-1. CompanyB
+SCRIPTS 2022: `Heřmánková, Petra, & Kaše, Vojtěch. (2022). sdam-au/EDH_ETL: Scripts (v2.0). Zenodo. https://doi.org/10.5281/zenodo.7303867 https://doi.org/10.5281/zenodo.7303867`
 
-### Hardware
-1. Multiple-screen
-1. Mouse
-1. Coffee
+_The 2022 dataset contains 81,883 cleaned and streamlined Latin inscriptions from the Epigraphic Database Heidelberg (EDH, https://edh-www.adw.uni-heidelberg.de/), aggregated on 2022/11/03, created for the purpose of a quantitative study of epigraphic trends by the Social Dynamics in the Ancient Mediterranean Project (SDAM, http://sdam.au.dk). The dataset contains 69 attributes with original and streamlined data. Compared to the 2021 dataset, there are 407 more inscriptions and 5 fewer attributes containing redundant legacy data, thus the entire dataset is approximately the same size but some of the attributes are streamlined (260 MB in 2022 compared to 234 MB in 2021). Some of the attribute were removed as they are no longer available due to the changes in the EDH itself, e.g. edh_geography_uri, external_image_uris, fotos, geography, military, social_economic_legal_history, uri; and some new attributes were added due to the streamlining of the ETL process, e.g. pleiades_id._
 
----
-## Installation
-[Describe the steps necessary to install the tool/package; example: https://gist.github.com/PurpleBooth/109311bb0361f32d87a2]
+**DATASET 2021**: `Heřmánková, Petra, & Kaše, Vojtěch. (2021). EDH_text_cleaned_2021_01_21 (v1.0) [Data set]. Zenodo. http://doi.org/10.5281/zenodo.4888168 http://doi.org/10.5281/zenodo.4888168`
 
----
-## Instructions 
-[Describe first steps, how to use the current repository by a typical user - the digital historian with limited technical skills]
-1. First, do ...
-1. Second, do ...
-1. Third, go to ...
+SCRIPTS 2021: `Heřmánková, Petra, & Kaše, Vojtěch. (2021). sdam-au/EDH_ETL: Scripts (v2.0). Zenodo. https://doi.org/10.5281/zenodo.6478243 https://doi.org/10.5281/zenodo.6478243`
 
+_The 2021 dataset contains 81,476 cleaned and streamlined Latin inscriptions from the Epigraphic Database Heidelberg (EDH, https://edh-www.adw.uni-heidelberg.de, License https://creativecommons.org/licenses/by-sa/4.0/), aggregated on 2021/01/21, created for the purpose of a quantitative study of epigraphic trends by the Social Dynamics in the Ancient Mediterranean Project (SDAM, http://sdam.au.dk)._
 
-## Screenshots
-![Example screenshot](./img/screenshot.png)
 
 
 
