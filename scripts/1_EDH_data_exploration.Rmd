@@ -1,0 +1,189 @@
+---
+title: "EDH people: exploration of the dataset"
+author: 
+- Petra Hermankova^[Aarhus University, Denmark, https://orcid.org/0000-0002-6349-0540]
+date: "`r format(Sys.Date())`"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_float: true
+    number_sections: true
+    toc_depth: 2
+    df_print: paged
+---
+
+## Initial setup
+
+```{r setup, echo=TRUE, message=FALSE, warning = FALSE}
+
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(jsonlite)
+```
+
+```{r dowloading data}
+getwd()
+dir.create("../data")
+dir.create("../data/large_data")
+
+# download (manually) as a local copy from Zenodo
+# version 2021 (81476)
+# download.file("https://zenodo.org/record/4888168/files/EDH_text_cleaned_2021-01-21.json?download=1", "../data/large_data/EDH_text_cleaned_2021-01-21.json")
+
+# version 2022 (81883)
+# download.file("https://zenodo.org/record/7303886/files/EDH_text_cleaned_2022-11-03.json?download=1", "../data/large_data/EDH_text_cleaned_2022-11-03.json")
+```
+
+```{r loading data}
+# 2021
+list_json <- jsonlite::fromJSON("../data/large_data/EDH_text_cleaned_2021-01-21.json")
+
+# 2022
+#list_json <- jsonlite::fromJSON("../data/large_data/EDH_text_cleaned_2022-11-03.json")
+
+EDH <- as_tibble(list_json)
+```
+
+
+## Subset the dataset to the minimal useful version
+
+```{r dataset filtering}
+EDHs<- EDH %>% 
+  select(id,
+         coordinates, findspot_ancient_clean, province_label_clean, modern_region_clean,
+         not_before, not_after,
+        type_of_monument_clean, material_clean,
+    type_of_inscription_clean,
+    transcription, clean_text_interpretive_word, 
+    people
+    ) %>% 
+  separate(col = coordinates, into = c("latitude", "longitude"), sep = ",")
+
+EDHs$longitude <- as.numeric(str_replace(EDHs$longitude, pattern = "\\)", replacement=""))
+EDHs$latitude <- as.numeric(str_replace(EDHs$latitude, pattern = "c\\(", replacement=""))
+```
+
+
+```{r extracting people}
+EDHs$people <- map(EDHs$people, as.data.frame)
+EDH_people<- EDHs %>% unnest_longer(col = people, keep_empty = TRUE)
+EDH_people<- EDH_people %>% 
+  unnest_wider(people)
+```
+
+## Data exploration
+
+**How many people there are per inscription (average, min, max)**
+```{r}
+summary(as.numeric(EDH_people$person_id))
+```
+
+### Gender
+
+**What is the gender ratio of people on inscriptions? (male, female, NA)**
+```{r}
+EDH_people %>% 
+  count(gender, sort = TRUE) %>% 
+  mutate(ratio = round(n/(sum(n)/100),2))
+```
+
+### Status
+
+**What are the names of unique values in the 'status' attribute?**
+```{r}
+EDH_people$status %>% 
+  unique()
+```
+
+
+**What is the ratio of different statuses, e.g. slave vs freedman**
+
+```{r}
+str_split_fixed(EDH_people$status, ";", n=3) %>% 
+  as.data.frame() -> status
+
+status %>% 
+  cbind(combined = c(status$V1,status$V2,status$V3)) %>% 
+  filter(combined != "") %>% 
+  mutate(combined_clean = str_replace_all(string = combined, pattern = "\\?", replacement = "")) %>% 
+  mutate(combined_clean = str_replace_all(string = combined_clean, pattern = "^ ", replacement = "")) %>% 
+  count(combined_clean, sort=TRUE) -> status_counts
+
+status_counts 
+```
+
+```{r}
+status_counts %>% 
+  mutate(combined_clean = reorder(combined_clean, n)) %>% 
+  ggplot(aes(y=combined_clean, x=n, fill=combined_clean)) +
+  geom_col(width=0.8, stat="identity") +
+  coord_cartesian(xlim=c(0,10000)) +
+  labs(x = "Number of instances", y = "Status category", title = "Overview of status references in the EDH dataset", subtitle = ggtitle(paste("n =", nrow(EDHs), "inscriptions"))) +
+  geom_label(aes(label= n)) +
+  theme_linedraw(base_size = 13) +
+  theme(legend.position = "none")
+
+
+dir.create("../figures")
+ggsave("../figures/Status_overview.jpg", width = 12, height = 8) 
+ggsave("../figures/Status_overview.png", width = 12, height = 8) 
+```
+### Age
+
+```{r}
+EDH_people<- EDH_people %>% 
+  mutate(age_years = as.numeric(str_extract(EDH_people$'age: years', pattern = "[:digit:]+"))) %>% 
+  mutate(age_months = as.numeric(str_extract(EDH_people$'age: months', pattern = "[:digit:]+"))) %>%
+  mutate(age_days = as.numeric(str_extract(EDH_people$'age: days', pattern = "[:digit:]+"))) %>%
+  mutate(age_hours = as.numeric(str_extract(EDH_people$'age: hours', pattern = "[:digit:]+"))) %>% 
+  mutate(months_to_years = age_months / 12) %>% 
+  mutate(days_to_years = age_days / 365) %>% 
+  mutate(hours_to_years = age_hours / (24*365)) %>% 
+  replace_na(list(months_to_years = 0, days_to_years = 0, hours_to_years = 0)) %>% 
+  mutate(total_age = age_years + months_to_years + days_to_years + hours_to_years) %>% 
+  dplyr::select(-ends_with("to_years")) %>% 
+  dplyr::select(-starts_with("age: "))
+
+```
+
+**Summary of age in years**
+
+```{r}
+summary(EDH_people$total_age)
+```
+
+**How many percent of people state their age on inscriptions**
+```{r}
+length(na.omit(EDH_people$total_age))/(nrow(EDH_people)/100)
+```
+
+
+### Origin
+
+**Cleaning origo**
+```{r}
+EDH_people <- EDH_people %>%
+  mutate(origo_clean = str_replace_all(origo, pattern="[\\*|\\+|\\?|\\!]", replacement="")) %>%
+  mutate(origo_clean = str_replace_all(origo_clean, pattern="(\\w+) \\(= (\\w+)\\)", replacement="\\2")) %>%
+  mutate(origo_clean = str_replace_all(origo_clean, pattern="gente|genitus|gentis|natus|civis|Civis|civus|natione|nato|regione|domo|domu|cives|cive|civi|ex|verna|tate", replacement="")) %>%
+  mutate(origo_clean = str_replace_all(origo_clean, pattern="^ ", replacement="")) %>%
+  mutate(origo_clean = str_replace_all(origo_clean, pattern="  ", replacement=" ")) 
+```
+
+```{r}
+table(EDH_people$origo_clean) %>% 
+  sort(decreasing = TRUE) %>% 
+  as.data.frame()
+```
+
+
+# Save the data as CSV
+
+```{r}
+dir.create("../data")
+write.csv(EDH_people, "../data/EDH_people_2021.csv", row.names=TRUE, sep = ";")
+
+```
+
