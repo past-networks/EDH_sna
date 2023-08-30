@@ -12,7 +12,7 @@ CC-BY-SA 4.0, see attached License.md
 
 ---
 
-### Data
+## Data
 **EDH dataset**
 
 **DATASET 2022**: `Heřmánková, Petra, & Kaše, Vojtěch. (2022). EDH_text_cleaned_2022_11_03 (v2.0) [Data set]. Zenodo. http://doi.org/10.5281/zenodo.7303886 http://doi.org/10.5281/zenodo.7303886`
@@ -27,7 +27,12 @@ SCRIPTS 2021: `Heřmánková, Petra, & Kaše, Vojtěch. (2021). sdam-au/EDH_ETL:
 
 _The 2021 dataset contains 81,476 cleaned and streamlined Latin inscriptions from the Epigraphic Database Heidelberg (EDH, https://edh-www.adw.uni-heidelberg.de, License https://creativecommons.org/licenses/by-sa/4.0/), aggregated on 2021/01/21, created for the purpose of a quantitative study of epigraphic trends by the Social Dynamics in the Ancient Mediterranean Project (SDAM, http://sdam.au.dk)._
 
+---
 
+## Scripts
+
+1. [Dataset extraction and basic exploration as HTML](https://past-networks.github.io/EDH_sna/scripts/1_EDH_data_exploration.html), [view raw code as Rmd](https://github.com/past-networks/EDH_sna/blob/master/scripts/1_EDH_data_exploration.Rmd) in GitHub
+  _Purpose of this script is to create a smaller subsection of the full Epigraphic Database Heidelberg (*EDH*) dataset that can be further explored for the purpose of the SNA within the *Past Social Network Project*, Aarhus University. A basic exploration of useful attributes connected to people on inscriptions, such as gender, age, social status, is included._
 
 
 

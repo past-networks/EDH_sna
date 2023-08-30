@@ -1,5 +1,5 @@
 ---
-title: "EDH people: exploration of the dataset"
+title: "EDH people: extraction of the dataset and basic exploration"
 author: 
 - Petra Hermankova^[Aarhus University, Denmark, https://orcid.org/0000-0002-6349-0540]
 date: "`r format(Sys.Date())`"
@@ -9,11 +9,17 @@ output:
     toc: yes
     toc_float: true
     number_sections: true
-    toc_depth: 2
+    toc_depth: 3
     df_print: paged
 ---
 
-## Initial setup
+_Purpose of this script is to create a smaller subsection of the full [Epigraphic Database Heidelberg (**EDH**) dataset](https://zenodo.org/record/4888168/) that can be further explored for the purpose of the SNA within the **Past Social Network Project**, Aarhus University. A basic exploration of useful attributes connected to people on inscriptions, such as gender, age, social status, is included._
+
+
+**WARNING!** The following code was designed for the 2021 version. As some attributes in the 2022 version changed, you may have to alter the code below where necessary.
+
+
+# Initial setup
 
 ```{r setup, echo=TRUE, message=FALSE, warning = FALSE}
 
@@ -24,16 +30,21 @@ library(jsonlite)
 ```
 
 ```{r dowloading data}
-getwd()
+# getwd() # check you working directory
 dir.create("../data")
 dir.create("../data/large_data")
 
-# download (manually) as a local copy from Zenodo
+# download as a local copy from Zenodo
 # version 2021 (81476)
 # download.file("https://zenodo.org/record/4888168/files/EDH_text_cleaned_2021-01-21.json?download=1", "../data/large_data/EDH_text_cleaned_2021-01-21.json")
 
+########### WARNING! In case you get an error message, you may have to manually download the dataset from Zenodo and save it to the 'large_data' folder. Don't forget to check if the dataset or the entire folder is in your .gitignore file, otherwise you are risking accidental commit to GitHub and than having to deal with removing the large file from your commit. 
+
 # version 2022 (81883)
 # download.file("https://zenodo.org/record/7303886/files/EDH_text_cleaned_2022-11-03.json?download=1", "../data/large_data/EDH_text_cleaned_2022-11-03.json")
+
+
+########### WARNING! The following code was designed for the 2021 version. As some attributes in the 2022 version changed, you may have to alter the code below where necessary.
 ```
 
 ```{r loading data}
@@ -47,7 +58,7 @@ EDH <- as_tibble(list_json)
 ```
 
 
-## Subset the dataset to the minimal useful version
+# Subset the dataset to the minimal useful version
 
 ```{r dataset filtering}
 EDHs<- EDH %>% 
@@ -73,34 +84,41 @@ EDH_people<- EDH_people %>%
   unnest_wider(people)
 ```
 
-## Data exploration
+```{r display few records}
+head(EDH_people, 10)
+```
 
-**How many people there are per inscription (average, min, max)**
-```{r}
+
+# Data exploration & streamlining
+
+## People on inscriptions
+
+### How many people there are per inscription (average, min, max)
+```{r how many people}
 summary(as.numeric(EDH_people$person_id))
 ```
 
-### Gender
+## Gender
 
-**What is the gender ratio of people on inscriptions? (male, female, NA)**
-```{r}
+### What is the gender ratio of people on inscriptions? (male, female, NA)
+```{r gender}
 EDH_people %>% 
   count(gender, sort = TRUE) %>% 
   mutate(ratio = round(n/(sum(n)/100),2))
 ```
 
-### Status
+## Status
 
-**What are the names of unique values in the 'status' attribute?**
-```{r}
+### What are the names of unique values in the 'status' attribute?
+```{r status}
 EDH_people$status %>% 
   unique()
 ```
 
 
-**What is the ratio of different statuses, e.g. slave vs freedman**
+### What is the ratio of different statuses, e.g. slave vs freedman
 
-```{r}
+```{r processing status}
 str_split_fixed(EDH_people$status, ";", n=3) %>% 
   as.data.frame() -> status
 
@@ -114,7 +132,7 @@ status %>%
 status_counts 
 ```
 
-```{r}
+```{r status figures}
 status_counts %>% 
   mutate(combined_clean = reorder(combined_clean, n)) %>% 
   ggplot(aes(y=combined_clean, x=n, fill=combined_clean)) +
@@ -130,9 +148,12 @@ dir.create("../figures")
 ggsave("../figures/Status_overview.jpg", width = 12, height = 8) 
 ggsave("../figures/Status_overview.png", width = 12, height = 8) 
 ```
-### Age
 
-```{r}
+## Age
+
+Before we can display the age of people, we need to streamline the age as it is recorded as character and distributed over several attributes, such as age in years, months, days. Then convert them to numeric value and save as total age in years.
+
+```{r processing age}
 EDH_people<- EDH_people %>% 
   mutate(age_years = as.numeric(str_extract(EDH_people$'age: years', pattern = "[:digit:]+"))) %>% 
   mutate(age_months = as.numeric(str_extract(EDH_people$'age: months', pattern = "[:digit:]+"))) %>%
@@ -148,22 +169,23 @@ EDH_people<- EDH_people %>%
 
 ```
 
-**Summary of age in years**
+### Summary of age in years
 
-```{r}
+```{r total age summary}
 summary(EDH_people$total_age)
 ```
 
-**How many percent of people state their age on inscriptions**
-```{r}
+### How many percent of people state their age on inscriptions
+```{r age on inscriptions}
 length(na.omit(EDH_people$total_age))/(nrow(EDH_people)/100)
 ```
 
 
-### Origin
+## Origin
 
-**Cleaning origo**
-```{r}
+Before we can display the origin of people, we need to streamline the text and clean it from uncertainty symbols and other variations. That way, we can get as close to the original place name as possible.
+
+```{r cleaning origo}
 EDH_people <- EDH_people %>%
   mutate(origo_clean = str_replace_all(origo, pattern="[\\*|\\+|\\?|\\!]", replacement="")) %>%
   mutate(origo_clean = str_replace_all(origo_clean, pattern="(\\w+) \\(= (\\w+)\\)", replacement="\\2")) %>%
@@ -172,16 +194,15 @@ EDH_people <- EDH_people %>%
   mutate(origo_clean = str_replace_all(origo_clean, pattern="  ", replacement=" ")) 
 ```
 
-```{r}
+### Summary of origo
+```{r origo overview}
 table(EDH_people$origo_clean) %>% 
   sort(decreasing = TRUE) %>% 
   as.data.frame()
 ```
 
-
-# Save the data as CSV
-
-```{r}
+# Save the streamlined data as CSV
+```{r save CSV}
 dir.create("../data")
 write.csv(EDH_people, "../data/EDH_people_2021.csv", row.names=TRUE, sep = ";")
 
