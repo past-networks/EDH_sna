@@ -27,6 +27,7 @@ knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 
 library(tidyverse)
 library(jsonlite)
+library(stringi)
 ```
 
 ```{r dowloading data}
@@ -200,6 +201,74 @@ table(EDH_people$origo_clean) %>%
   sort(decreasing = TRUE) %>% 
   as.data.frame()
 ```
+
+## Names and family ties
+
+### Family name (nomen)
+
+Description as found at the EDH website:
+
+```
+Nomen / Nomina of a person named in the inscription. 
+
+Here one can search for the occurrence of a nomen independent of case, spelling and state of preservation on the inscription bearer.
+
+Spelling:
+- Always in the nominative irrespective of the case in the inscription.
+- correct spelling without brackets
+- In the case of the emperors up to and including Nero Caesar is treated as a part of the name.
+
+
+Resolution of abbreviations and supplements / erasures are not indicate by round or square brackets ( ), [ ], [[ ]], [[[ ]]], but through:
+* = resolved
++ = supplemented
+++ = erased, but still readable
++++ = erased and no longer readable
+
+```
+
+```{r nomen exploration}
+EDH_people %>% 
+  count(nomen, sort=T)
+```
+
+Cleaning of the family name for our purposes:
+
+```{r cleaning nomen}
+#####WARNING! This code needs to be commented out when knitting.
+
+EDH_people<- EDH_people %>% 
+  mutate(nomen_clean = str_replace_all(EDH_people$nomen, "\\+{1,3}", "")) %>% 
+  mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "\\*", "")) %>% 
+  mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "[\\+\\*]", "")) %>% 
+  mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "[\\!]", "")) %>% 
+  mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "\\)\\?", "\\)")) %>% 
+  mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "\\?", "")) 
+```
+
+```{r encoding conversion}
+library(stringi)
+
+# Convert the encoding of the nomen_clean column
+# EDH_people$nomen_clean <- iconv(EDH_people$nomen_clean, from = "UTF-8", to = "windows-1252")
+
+```
+
+
+```{r clean nomen overview}
+EDH_people %>% 
+  count(nomen_clean, sort=T)
+```
+
+
+Ordering the attributes so they are ordered logically
+```{r ordering}
+EDH_people<- EDH_people %>% 
+  select(id, latitude, longitude, findspot_ancient_clean, province_label_clean, modern_region_clean, not_before, not_after, type_of_monument_clean, material_clean, type_of_inscription_clean, transcription, clean_text_interpretive_word, person_id, name, praenomen, nomen, nomen_clean, cognomen, supernomen, gender, origo, status, total_age, age_years, age_months, age_months, age_hours)
+```
+
+
+
 
 # Save the streamlined data as CSV
 ```{r save CSV}

@@ -1,0 +1,66 @@
+---
+title: "EDH people: family ties on inscriptions"
+author: 
+- Petra Hermankova^[Aarhus University, Denmark, https://orcid.org/0000-0002-6349-0540]
+date: "`r format(Sys.Date())`"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_float: true
+    number_sections: true
+    toc_depth: 3
+    df_print: paged
+---
+
+_Purpose of this script is to explore family ties on inscriptions from the [Epigraphic Database Heidelberg (**EDH**) dataset](https://zenodo.org/record/4888168/)  for the purpose of the SNA within the **Past Social Network Project**, Aarhus University._
+
+
+**WARNING!** The following code was designed for the 2021 version. As some attributes in the 2022 version changed, you may have to alter the code below where necessary.
+
+
+# Initial setup
+
+```{r setup, echo=TRUE, message=FALSE, warning = FALSE}
+
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(jsonlite)
+library(igraph)
+```
+
+
+```{r loading data}
+# 2021
+EDH_people <- read_csv("../data/EDH_people_2021.csv", progress = T)
+
+# 2022
+# not implemented yet
+```
+
+
+# Exploring family ties
+
+```{r}
+### need to get rid of NAs
+
+head(EDH_people, 5) %>% 
+  select(name, nomen_clean) -> sample
+
+edges <- as.matrix(sample)
+g <- graph_from_edgelist(edges, directed = FALSE)
+plot(g)
+```
+
+
+
+```{r}
+EDH_people_existing_nomen <-as.character(na.omit(EDH_people$nomen_clean))
+
+sample2 <- head(EDH_people_existing_nomen, 50)
+
+f <- graph(sample2, directed = FALSE)
+plot(f)
+```
+
