@@ -43,9 +43,11 @@ EDH_people <- read_csv("../data/EDH_people_2021.csv", progress = T)
 # Exploring family ties
 
 ```{r}
-### need to get rid of NAs
+# test with the first 20 people in the dataset
+small <- head(EDH_people, 20)
 
-head(EDH_people, 5) %>% 
+small %>% 
+  filter(!is.na(nomen_clean)) %>% 
   select(name, nomen_clean) -> sample
 
 edges <- as.matrix(sample)
@@ -56,11 +58,24 @@ plot(g)
 
 
 ```{r}
-EDH_people_existing_nomen <-as.character(na.omit(EDH_people$nomen_clean))
+# people on inscriptions from Pompeii where the inscriptions was created after 30 AD
 
-sample2 <- head(EDH_people_existing_nomen, 50)
+EDH_people %>% 
+  filter(!is.na(nomen_clean)) %>% 
+  filter(!is.na(name)) %>% 
+  filter(!is.na(not_before)) %>%
+  filter(!is.na(not_after)) %>%
+  select(name, nomen_clean, findspot_ancient_clean, not_before, not_after) -> EDH_nomen
 
-f <- graph(sample2, directed = FALSE)
-plot(f)
+
+EDH_nomen_pompeii <- EDH_nomen %>% 
+  filter(findspot_ancient_clean == "Pompeii") %>% 
+  filter(as.numeric(not_before) > 30)
+
+edges_nomen <- as.matrix(EDH_nomen_pompeii)
+
+
+f_nomen <- graph(edges_nomen, directed = TRUE)
+plot(f_nomen)
 ```
 
