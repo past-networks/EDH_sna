@@ -3,3 +3,4 @@
 .Rproj.user
 ../data/large_data/
 ../data/large_data/EDH_text_cleaned_2021-01-21.json
+*.json

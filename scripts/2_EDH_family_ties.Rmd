@@ -50,6 +50,9 @@ small %>%
   filter(!is.na(nomen_clean)) %>% 
   select(name, nomen_clean) -> sample
 
+
+## graph from edge list
+
 edges <- as.matrix(sample)
 g <- graph_from_edgelist(edges, directed = FALSE)
 plot(g)
@@ -58,24 +61,77 @@ plot(g)
 
 
 ```{r}
-# people on inscriptions from Pompeii where the inscriptions was created after 30 AD
+# people in the higher offices on inscriptions from Pompeii 
 
 EDH_people %>% 
   filter(!is.na(nomen_clean)) %>% 
   filter(!is.na(name)) %>% 
   filter(!is.na(not_before)) %>%
   filter(!is.na(not_after)) %>%
-  select(name, nomen_clean, findspot_ancient_clean, not_before, not_after) -> EDH_nomen
+  filter(!is.na(status)) %>%
+  select(name, nomen_clean, findspot_ancient_clean, not_before, not_after, status, province_label_clean) -> EDH_nomen
 
 
-EDH_nomen_pompeii <- EDH_nomen %>% 
-  filter(findspot_ancient_clean == "Pompeii") %>% 
-  filter(as.numeric(not_before) > 30)
+higher_office<- str_subset(string = EDH_nomen$status, pattern = ".*higher*")
 
-edges_nomen <- as.matrix(EDH_nomen_pompeii)
+EDH_nomen_ho <- EDH_nomen %>% 
+  filter(status == higher_office) 
 
+EDH_nomen_ho_pompeii <- EDH_nomen_ho %>% 
+  filter(findspot_ancient_clean == "Pompeii") 
 
-f_nomen <- graph(edges_nomen, directed = TRUE)
-plot(f_nomen)
+# graph from matrix
+
+edges_nomen_ho <- EDH_nomen_ho_pompeii %>% 
+  select(name, nomen_clean) %>% 
+  as.matrix()
+
+f_nomen_ho <- graph_from_edgelist(edges_nomen_ho, directed = TRUE)
+plot(f_nomen_ho)
+```
+
+```{r}
+# people in the lower offices on inscriptions from Pompeii
+
+lower_office<- str_subset(string = EDH_nomen$status, pattern = ".*lower*")
+
+EDH_nomen_lo <- EDH_nomen %>% 
+  filter(status == lower_office) 
+
+EDH_nomen_lo_pompeii <- EDH_nomen_lo %>% 
+  filter(findspot_ancient_clean == "Pompeii") 
+
+# graph from matrix
+
+edges_nomen_lo <- EDH_nomen_lo_pompeii %>% 
+  select(name, nomen_clean) %>% 
+  as.matrix()
+
+f_nomen_lo <- graph_from_edgelist(edges_nomen_lo, directed = TRUE)
+plot(f_nomen_lo)
+
+```
+
+```{r}
+# people in the lower offices on inscriptions from the EDH
+
+lower_office<- str_subset(string = EDH_nomen$status, pattern = ".*lower*")
+
+EDH_nomen_lo <- EDH_nomen %>% 
+  filter(status == lower_office) 
+
+# graph from matrix
+
+edges_nomen_lo <- EDH_nomen_lo %>% 
+  select(name, nomen_clean) %>% 
+  as.matrix()
+
+f_nomen_lo <- graph_from_edgelist(edges_nomen_lo, directed = TRUE)
+plot(f_nomen_lo)
+```
+```{r}
+edges_nomen_lo
+
+plot(f_nomen_lo, vertex.color = as.factor(V(f_nomen_lo)$nomen_clean))
 ```
 
