@@ -260,11 +260,22 @@ EDH_people %>%
   count(nomen_clean, sort=T)
 ```
 
+```{r, index number for people}
+
+# creating a unique ID number for people
+EDH_people$id_people <- 1:nrow(EDH_people)
+
+# renaming variable describing the number of people on one inscription
+EDH_people <-rename(EDH_people, person_number_insc = person_id)
+
+```
+
+
 
 Ordering the attributes so they are ordered logically
 ```{r ordering}
 EDH_people<- EDH_people %>% 
-  select(id, latitude, longitude, findspot_ancient_clean, province_label_clean, modern_region_clean, not_before, not_after, type_of_monument_clean, material_clean, type_of_inscription_clean, transcription, clean_text_interpretive_word, person_id, name, praenomen, nomen, nomen_clean, cognomen, supernomen, gender, origo, status, total_age, age_years, age_months, age_months, age_hours)
+  select(id, latitude, longitude, findspot_ancient_clean, province_label_clean, modern_region_clean, not_before, not_after, type_of_monument_clean, material_clean, type_of_inscription_clean, transcription, clean_text_interpretive_word, id_people, person_number_insc, name, praenomen, nomen, nomen_clean, cognomen, supernomen, gender, origo, status, total_age, age_years, age_months, age_months, age_hours)
 ```
 
 

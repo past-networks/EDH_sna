@@ -91,19 +91,19 @@ plot(f_nomen_ho)
 ```
 
 ```{r}
-# people in the lower offices on inscriptions from Pompeii
+# people in the lower offices on inscriptions from Rome
 
 lower_office<- str_subset(string = EDH_nomen$status, pattern = ".*lower*")
 
 EDH_nomen_lo <- EDH_nomen %>% 
   filter(status == lower_office) 
 
-EDH_nomen_lo_pompeii <- EDH_nomen_lo %>% 
-  filter(findspot_ancient_clean == "Pompeii") 
+EDH_nomen_lo_roma <- EDH_nomen_lo %>% 
+  filter(findspot_ancient_clean == "Roma") 
 
-# graph from matrix
+# graph from edgelist
 
-edges_nomen_lo <- EDH_nomen_lo_pompeii %>% 
+edges_nomen_lo <- EDH_nomen_lo_roma %>% 
   select(name, nomen_clean) %>% 
   as.matrix()
 
@@ -120,18 +120,37 @@ lower_office<- str_subset(string = EDH_nomen$status, pattern = ".*lower*")
 EDH_nomen_lo <- EDH_nomen %>% 
   filter(status == lower_office) 
 
-# graph from matrix
+# graph from edgelist
 
 edges_nomen_lo <- EDH_nomen_lo %>% 
   select(name, nomen_clean) %>% 
-  as.matrix()
+  as.matrix(directed=FALSE)
 
-f_nomen_lo <- graph_from_edgelist(edges_nomen_lo, directed = TRUE)
+f_nomen_lo <- graph_from_edgelist(edges_nomen_lo, directed = FALSE)
+set.seed(1000)
 plot(f_nomen_lo)
 ```
-```{r}
-edges_nomen_lo
 
-plot(f_nomen_lo, vertex.color = as.factor(V(f_nomen_lo)$nomen_clean))
+```{r}
+# adjacency matrix
+
+f_nomen_lo_mat<- igraph::as_adjacency_matrix(f_nomen_lo)
+
+graph_lo_adjmat <- igraph::graph_from_adjacency_matrix(f_nomen_lo_mat)
+set.seed(1000)
+plot(graph_lo_adjmat)
+```
+```{r}
+#ego network
+
+ego_nets<- make_ego_graph(f_nomen_lo)
+
+ego_nets[[2]]
+set.seed(1000)
+ego_size(f_nomen_lo)
+
+# ego size of Iulius family - people holding a lower office
+plot(ego_nets[[31]])
+
 ```
 
