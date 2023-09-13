@@ -1,0 +1,85 @@
+---
+title: "EDH people: spatial networks on inscriptions"
+author: 
+- Petra Hermankova^[Aarhus University, Denmark, https://orcid.org/0000-0002-6349-0540]
+date: "`r format(Sys.Date())`"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_float: true
+    number_sections: true
+    toc_depth: 3
+    df_print: paged
+---
+
+_Purpose of this script is to explore spatial relationships of people on inscriptions from the [Epigraphic Database Heidelberg (**EDH**) dataset](https://zenodo.org/record/4888168/)  for the purpose of the SNA within the **Past Social Network Project**, Aarhus University._
+
+
+**WARNING!** The following code was designed for the 2021 version. As some attributes in the 2022 version changed, you may have to alter the code below where necessary.
+
+
+# Initial setup
+
+```{r setup, echo=TRUE, message=FALSE, warning = FALSE}
+
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(jsonlite)
+library(igraph)
+```
+
+
+```{r loading data}
+# 2021
+EDH_people <- read_csv("../data/EDH_people_2021.csv", progress = T)
+
+# 2022
+# not implemented yet
+```
+
+
+# Exploring spatial relationships in the dataset
+
+TBA
+
+# Exploring types of inscriptions
+
+```{r}
+EDH_people %>% 
+  filter(!is.na(name)) %>% 
+  filter(type_of_inscription_clean == "epitaph") %>% 
+  count(person_number_insc, sort=T)
+```
+
+```{r}
+EDH_people %>% 
+  filter(type_of_inscription_clean == "epitaph") %>% 
+  count(person_number_insc, sort=T)
+
+# filter out inscription with more than 10 family members
+
+fam10 <- EDH_people %>% 
+  filter(type_of_inscription_clean == "epitaph") %>% 
+  filter(person_number_insc > 10)
+
+fam10_names <- str_subset(fam10$id, "HD\\d{6}")
+
+
+# turn it to network 
+
+fam10 %>% 
+  filter(id %in% fam10_names) -> network10
+
+edges10 <- network10 %>% 
+  filter(!is.na(name) & !is.na(id)) %>% 
+  select(name, id) %>% 
+  as.matrix()
+
+g10 <- graph_from_edgelist(edges10, directed = FALSE)
+plot(g10)
+
+
+# NOTES: needs fixing of names, plus need to figure out better plotting
+```

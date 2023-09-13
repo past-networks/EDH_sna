@@ -107,7 +107,7 @@ edges_nomen_lo <- EDH_nomen_lo_roma %>%
   select(name, nomen_clean) %>% 
   as.matrix()
 
-f_nomen_lo <- graph_from_edgelist(edges_nomen_lo, directed = TRUE)
+f_nomen_lo <- graph_from_edgelist(edges_nomen_lo, directed = FALSE)
 plot(f_nomen_lo)
 
 ```
@@ -152,5 +152,11 @@ ego_size(f_nomen_lo)
 # ego size of Iulius family - people holding a lower office
 plot(ego_nets[[31]])
 
+```
+```{r}
+EDH_people %>% 
+  filter(!is.na(nomen_clean)) %>% 
+  count(nomen_clean, sort=T) %>% 
+  filter(n> 100)
 ```
 

@@ -83,7 +83,20 @@ EDHs$people <- map(EDHs$people, as.data.frame)
 EDH_people<- EDHs %>% unnest_longer(col = people, keep_empty = TRUE)
 EDH_people<- EDH_people %>% 
   unnest_wider(people)
+
+nrow(EDH_people)
+
 ```
+
+```{r}
+#extracting only inscriptions with people in them
+
+EDH_people <- EDH_people %>% 
+  filter(!is.na(name))
+
+nrow(EDH_people)
+```
+
 
 ```{r display few records}
 head(EDH_people, 10)
@@ -250,7 +263,7 @@ EDH_people<- EDH_people %>%
 library(stringi)
 
 # Convert the encoding of the nomen_clean column
-# EDH_people$nomen_clean <- iconv(EDH_people$nomen_clean, from = "UTF-8", to = "windows-1252")
+ EDH_people$nomen_clean <- iconv(EDH_people$nomen_clean, from = "UTF-8", to = "windows-1252")
 
 ```
 
