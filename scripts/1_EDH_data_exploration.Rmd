@@ -199,6 +199,24 @@ length(na.omit(EDH_people$total_age))/(nrow(EDH_people)/100)
 
 Before we can display the origin of people, we need to streamline the text and clean it from uncertainty symbols and other variations. That way, we can get as close to the original place name as possible.
 
+Desription from the EDH website:   
+
+```
+Geographical information concerning the origin of a person named in the inscription
+
+spelling guide:
+usually as it is in the text of the inscription
+(e.g. "Alba Pompeia", "natione Surus domo Hemesa", "ex Italia / τῶν ἐξ Ἰταλίας", "ex provincia Asia civitate Focia")
+in the nominative only when adjectives are used (e.g. "Ulisitanus", "Emeritensis", "Ῥωμαῖος")
+correct spelling without brackets
+Designation of resolutions and supplements / erasures:
+* = resolved abbreviation
++ = supplied
+++ = erased, but still readable
++++ = erased and no longer readable
+```
+
+
 ```{r cleaning origo}
 EDH_people <- EDH_people %>%
   mutate(origo_clean = str_replace_all(origo, pattern="[\\*|\\+|\\?|\\!]", replacement="")) %>%
@@ -216,6 +234,75 @@ table(EDH_people$origo_clean) %>%
 ```
 
 ## Names and family ties
+
+### Name
+
+Each individual person is identified on the basis of the 'name' attribute.
+Here is the attribute description as found at the EDH website:
+
+```
+Name (including filiation), Tribus and Origo of a person named in the inscription
+
+spelling:
+as found and preserved in the inscriptio
+include supplements, but without resolution of abbreviations
+Emperors: the nomenclature "Imperator Caesar ... Augustus" is only indicated in the database for the Julian / Claudian emperors; "without Epithets (Pius, Felix, Invictus) or victory names (Parthicus maximus etc.)
+```
+
+#### Cleaning of the name
+```{r cleaning name}
+
+restoration_interpretive <- c("[\\[*\\]]", "")
+substitution_edh_interpretive <- c("([α-ωΑ-Ωa-zA-Z])=([α-ωΑ-Ωa-zA-Z])", "\\1")
+#substitution_interpretive <- c("[\\<*\\>]", "")
+arabic_numerals <- c("[0-9]+", "")
+erasure_new_text <- c("[〚〛]", "")
+#erasure_new_text_triple <- c("\\[\\[\\[|\\]\\]\\]", "")
+#erasure_new_text_double <- c("\\[\\[|\\]\\]", "")
+
+cleaning_interpretive_word_edh <- function(epigraphic_dataset){      
+  clean_text <- gsub(pattern=substitution_edh_interpretive[1], replacement=substitution_edh_interpretive[2], x=epigraphic_dataset, perl=TRUE)
+  #clean_text <- gsub(pattern=substitution_interpretive[1], replacement=substitution_interpretive[2], x=clean_text, perl=TRUE)
+  clean_text <- gsub(pattern=erasure_new_text[1], replacement=erasure_new_text[2], x=clean_text, perl=TRUE)
+  #clean_text <- gsub(pattern=erasure_new_text_triple[1], replacement=erasure_new_text_triple[2], x=clean_text, perl=TRUE)
+  #clean_text <- gsub(pattern=erasure_new_text_double[1], replacement=erasure_new_text_double[2], x=clean_text, perl=TRUE)
+  clean_text <- gsub(pattern=arabic_numerals[1], replacement=arabic_numerals[2], x=clean_text, perl=TRUE)
+    return(clean_text)
+}
+
+EDH_people<- EDH_people %>% 
+  mutate(name_clean = cleaning_interpretive_word_edh(EDH_people$name))
+```
+
+```{r test cleaning}
+input_string <- "[[[P. Septimius Geta]]]"
+input_string <- "[[Geta]]"
+input_string <- "[[---]]"
+result <- gsub("\\[\\[\\[|\\]\\]\\]", "", input_string, perl=TRUE)
+result <- gsub("\\[\\[|\\]\\]", "", input_string, perl=TRUE)
+cat(result)
+```
+
+
+
+```{r clean name}
+EDH_people %>% 
+  count(name_clean, name, sort=F) %>% 
+  View()
+```
+
+Some people do have the attribute 'name' empty, but there are still relevant information. However, for the SNA they should be removed, otherwise they will create connections and relationships where there were none.
+
+```{r}
+# review inscriptions with people with an empty name in [---], [[---]], [[[---]]]
+
+empty_name_string <- c("[---]", "[[---]]", "[[[---]]]")
+
+# remove people with no name, use at caution
+EDH_people_rn<- EDH_people %>% 
+  filter(!name_clean %in% empty_name_string)
+```
+
 
 ### Family name (nomen)
 
@@ -245,17 +332,26 @@ EDH_people %>%
   count(nomen, sort=T)
 ```
 
-Cleaning of the family name for our purposes:
+#### Cleaning of the family name for our purposes
 
 ```{r cleaning nomen}
-#####WARNING! This code needs to be commented out when knitting.
 
 EDH_people<- EDH_people %>% 
-  mutate(nomen_clean = str_replace_all(EDH_people$nomen, "\\+{1,3}", "")) %>% 
-  mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "\\*", "")) %>% 
-  mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "[\\+\\*]", "")) %>% 
-  mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "[\\!]", "")) %>% 
-  mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "\\)\\?", "\\)")) %>% 
+  mutate(nomen_clean = str_replace_all(EDH_people$nomen, "\\+{1,3}", "")) 
+
+EDH_people<- EDH_people %>% 
+  mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "\\*", "")) 
+
+EDH_people<- EDH_people %>% 
+  mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "[\\+\\*]", "")) 
+
+EDH_people<- EDH_people %>% 
+  mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "[\\!]", "")) 
+
+EDH_people<- EDH_people %>% 
+  mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "\\)\\?", "\\)")) 
+
+EDH_people<- EDH_people %>% 
   mutate(nomen_clean = str_replace_all(EDH_people$nomen_clean, "\\?", "")) 
 ```
 
@@ -264,14 +360,20 @@ library(stringi)
 
 # Convert the encoding of the nomen_clean column
  EDH_people$nomen_clean <- iconv(EDH_people$nomen_clean, from = "UTF-8", to = "windows-1252")
+ EDH_people$nomen_clean <- iconv(EDH_people$nomen_clean, from = "windows-1252", to = "UTF-8")
+ #EDH_people$name <- iconv(EDH_people$name, from = "UTF-8", to = "windows-1252")
+ #EDH_people$name <- iconv(EDH_people$name, from = "windows-1252", to = "UTF-8")
 
 ```
-
 
 ```{r clean nomen overview}
 EDH_people %>% 
   count(nomen_clean, sort=T)
 ```
+
+
+
+### Indexing people
 
 ```{r, index number for people}
 
@@ -288,7 +390,7 @@ EDH_people <-rename(EDH_people, person_number_insc = person_id)
 Ordering the attributes so they are ordered logically
 ```{r ordering}
 EDH_people<- EDH_people %>% 
-  select(id, latitude, longitude, findspot_ancient_clean, province_label_clean, modern_region_clean, not_before, not_after, type_of_monument_clean, material_clean, type_of_inscription_clean, transcription, clean_text_interpretive_word, id_people, person_number_insc, name, praenomen, nomen, nomen_clean, cognomen, supernomen, gender, origo, status, total_age, age_years, age_months, age_months, age_hours)
+  select(id, latitude, longitude, findspot_ancient_clean, province_label_clean, modern_region_clean, not_before, not_after, type_of_monument_clean, material_clean, type_of_inscription_clean, transcription, clean_text_interpretive_word, id_people, person_number_insc, name, praenomen, nomen, name_clean, nomen_clean, cognomen, supernomen, gender, origo, status, total_age, age_years, age_months, age_months, age_hours)
 ```
 
 

@@ -44,42 +44,4 @@ EDH_people <- read_csv("../data/EDH_people_2021.csv", progress = T)
 
 TBA
 
-# Exploring types of inscriptions
 
-```{r}
-EDH_people %>% 
-  filter(!is.na(name)) %>% 
-  filter(type_of_inscription_clean == "epitaph") %>% 
-  count(person_number_insc, sort=T)
-```
-
-```{r}
-EDH_people %>% 
-  filter(type_of_inscription_clean == "epitaph") %>% 
-  count(person_number_insc, sort=T)
-
-# filter out inscription with more than 10 family members
-
-fam10 <- EDH_people %>% 
-  filter(type_of_inscription_clean == "epitaph") %>% 
-  filter(person_number_insc > 10)
-
-fam10_names <- str_subset(fam10$id, "HD\\d{6}")
-
-
-# turn it to network 
-
-fam10 %>% 
-  filter(id %in% fam10_names) -> network10
-
-edges10 <- network10 %>% 
-  filter(!is.na(name) & !is.na(id)) %>% 
-  select(name, id) %>% 
-  as.matrix()
-
-g10 <- graph_from_edgelist(edges10, directed = FALSE)
-plot(g10)
-
-
-# NOTES: needs fixing of names, plus need to figure out better plotting
-```

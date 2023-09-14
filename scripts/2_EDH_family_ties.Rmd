@@ -28,12 +28,13 @@ knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 library(tidyverse)
 library(jsonlite)
 library(igraph)
+library(readr)
 ```
 
 
 ```{r loading data}
 # 2021
-EDH_people <- read_csv("../data/EDH_people_2021.csv", progress = T)
+EDH_people <- read_csv("../data/EDH_people_2021.csv", progress = T, locale = readr::locale(encoding = "UTF-8"))
 
 # 2022
 # not implemented yet
@@ -42,9 +43,23 @@ EDH_people <- read_csv("../data/EDH_people_2021.csv", progress = T)
 
 # Exploring family ties
 
-```{r}
+
+```{r filtering missing or uncertain nomen}
+
+missing_nomen_regex<- "([A-Z]*)(\\(|\\[)---(\\)|\\])([a-z]*)"
+
+
+EDH_people$nomen_nonempty <-gsub(pattern = missing_nomen_regex, replacement = "", x= EDH_people$nomen_clean, perl=TRUE)
+
+EDH_people %>% 
+  filter(!is.na(nomen_nonempty)) %>% 
+  filter(nomen_nonempty != "[---]" & nomen_nonempty != "") -> EDH_people_nomen
+```
+
+
+```{r test graph}
 # test with the first 20 people in the dataset
-small <- head(EDH_people, 20)
+small <- head(EDH_people_nomen, 20)
 
 small %>% 
   filter(!is.na(nomen_clean)) %>% 
@@ -63,7 +78,7 @@ plot(g)
 ```{r}
 # people in the higher offices on inscriptions from Pompeii 
 
-EDH_people %>% 
+EDH_people_nomen %>% 
   filter(!is.na(nomen_clean)) %>% 
   filter(!is.na(name)) %>% 
   filter(!is.na(not_before)) %>%
@@ -153,10 +168,54 @@ ego_size(f_nomen_lo)
 plot(ego_nets[[31]])
 
 ```
-```{r}
+
+
+# Exploring types of inscriptions
+
+```{r, funerary inscriptions}
+# how many people there are on one funerary inscription
+
+#they appear on the same inscription - there is a direct relationship between them
+
 EDH_people %>% 
-  filter(!is.na(nomen_clean)) %>% 
-  count(nomen_clean, sort=T) %>% 
-  filter(n> 100)
+  filter(!is.na(name)) %>% 
+  filter(type_of_inscription_clean == "epitaph") %>% 
+  count(person_number_insc, sort=T)
 ```
 
+```{r}
+EDH_people %>% 
+  filter(type_of_inscription_clean == "epitaph") %>% 
+  count(person_number_insc, sort=T)
+
+# transforming encoding
+
+ EDH_people$name <- iconv(EDH_people$name, from = "UTF-8", to = "windows-1252")
+ #EDH_people$name <- iconv(EDH_people$name, from = "windows-1252", to = "UTF-8")
+
+ # filter out inscription with more than 10 family members
+ 
+fam10 <- EDH_people %>% 
+  filter(type_of_inscription_clean == "epitaph") %>% 
+  filter(person_number_insc > 10)
+
+fam10_names <- str_subset(fam10$id, "HD\\d{6}")
+
+
+# turn it to network 
+
+fam10 %>% 
+  filter(id %in% fam10_names) -> network10
+
+edges10 <- network10 %>% 
+  filter(!is.na(name) & !is.na(id)) %>% 
+  select(name, id) %>% 
+  as.matrix()
+
+g10 <- graph_from_edgelist(edges10, directed = FALSE)
+plot(g10)
+
+
+# NOTES: needs fixing of names, plus need to figure out better plotting, 
+
+```
