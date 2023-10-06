@@ -394,8 +394,6 @@ EDH_people<- EDH_people %>%
 ```
 
 
-
-
 # Save the streamlined data as CSV
 ```{r save CSV}
 dir.create("../data")
@@ -403,3 +401,63 @@ write.csv(EDH_people, "../data/EDH_people_2021.csv", row.names=TRUE, sep = ";")
 
 ```
 
+# Networks potential 
+
+## Inscriptions with 100 and more people
+```{r people 100}
+
+EDH_people %>% 
+  filter(person_number_insc >100) %>% 
+  count(id, clean_text_interpretive_word, sort=T) -> inscr_100_people
+inscr_100_people
+```
+
+1. HD032316
+https://edh.ub.uni-heidelberg.de/edh/inschrift/HD032316 inscription with 244 veterans of legio VII Claudia, separated by cohors, from Viminacium (Serbia), 195 AD, some of them have a geographic origin, e.g. Pautalia, Scupis, Remesiana, Ratiaria, Sarmizegetusa, Montana, Salonika, Nikomedia, Pergamon, Sirmii, ...
+
+More background: 264 inscriptions from Viminacium, total 866 people
+
+```{r} 
+# filter for people from Viminacium, where not before date is bigger than 170 and smaller than 220
+EDH_people %>% 
+  filter(findspot_ancient_clean == "Viminacium") -> viminacium
+
+viminacium %>% 
+  filter(as.numeric(not_before) > 170 & as.numeric(not_before) < 220)
+```
+
+```{r}
+View(viminacium)
+```
+
+
+
+2. HD043480
+https://edh.ub.uni-heidelberg.de/edh/inschrift/HD043480 inscription with 237 veterans of unknown unit, separated by cohors, Troesmis (Romania), 134 AD. No geographic origin, but some functions.
+
+3. HD005647
+https://edh.ub.uni-heidelberg.de/edh/inschrift/HD005647, list of 163 men and women with some occupations, Classis (Italy), 171-230 AD
+
+4. HD017350
+https://edh.ub.uni-heidelberg.de/edh/inschrift/HD017350, list of 149 soldiers, names of the praetorians and legionnaires and the auxiliary soldiers, sometimes with their origin and rank, Tropaeum Traiana (Romania), 87 AD – 90 AD
+
+5. HD000674	
+https://edh.ub.uni-heidelberg.de/edh/inschrift/HD000674, list of 147 members of collegium centonarium, Flavia Solva (Austria), 205 AD
+
+6. HD042833	
+https://edh.ub.uni-heidelberg.de/edh/inschrift/HD042833, list of 142 male members of the cult of Bacchus, some of them hacve social status specified, Nicopolis ad Istrum (Bulgaria), 227 AD
+
+
+7. HD065217	
+https://edh.ub.uni-heidelberg.de/edh/inschrift/HD065217, list of 119 male members of Sarapis and Isis cult with their functions, Maroneia (Greece), 200 BC - 1 BC
+
+
+8. HD019742	
+https://edh.ub.uni-heidelberg.de/edh/inschrift/HD019742, list of 114 soldiers made citizens, also known as Decretum Cn. Pompei Strabonis de Civitate Equitibus Hispanis Danda, Roma (Italy), 89 BC
+
+9. HD005863	
+https://edh.ub.uni-heidelberg.de/edh/inschrift/HD005863, list of 103 soldiers, Classis (Italy), 151 – 230 AD
+
+
+10. HD051713
+https://edh.ub.uni-heidelberg.de/edh/inschrift/HD051713, list of men, some of them called pater, some of them obitus/deceased, Building/foundation inscription from Municipium Claudium Virunum (Austria), 182 - 184 AD 
