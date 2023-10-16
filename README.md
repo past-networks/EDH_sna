@@ -7,6 +7,9 @@ This repository aims to use the existing EDH dataset to create past social netwo
 * Petra Hermankova [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0002-6349-0540)
 * [Name], [ORCID], [Institution]
 
+## Funding
+*The Past Social Networks Projects* is funded by The Carlsberg Foundation’s Young Researcher Fellowship (CF21-0382) in 2022-2026. 
+
 ## License
 CC-BY-SA 4.0, see attached License.md
 
