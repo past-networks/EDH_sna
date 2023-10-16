@@ -3,8 +3,12 @@
 ## About
 This repository aims to use the existing EDH dataset to create past social networks from inscriptions as part of the Past Social Network project.
 
-## Authors
-* Petra Hermankova [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0002-6349-0540)
+## Authors 
+* Petra Hermankova [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0002-6349-0540), PSN, Aarhus University
+* Matteo Mazzamurro [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0009-0004-4454-1551), PSN, Aarhus University
+* Tom Brughmans [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0002-1589-7768), PSN, Aarhus University
+* [Name], [ORCID], [Institution], 
+* [Name], [ORCID], [Institution]
 * [Name], [ORCID], [Institution]
 
 ## Funding
@@ -37,5 +41,15 @@ _The 2021 dataset contains 81,476 cleaned and streamlined Latin inscriptions fro
 1. [Dataset extraction and basic exploration as HTML](https://past-networks.github.io/EDH_sna/scripts/1_EDH_data_exploration.html), [view raw code as Rmd](https://github.com/past-networks/EDH_sna/blob/master/scripts/1_EDH_data_exploration.Rmd) in GitHub
   _Purpose of this script is to create a smaller subsection of the full Epigraphic Database Heidelberg (*EDH*) dataset that can be further explored for the purpose of the SNA within the *Past Social Network Project*, Aarhus University. A basic exploration of useful attributes connected to people on inscriptions, such as gender, age, social status, is included._
 
+## DOI
+TBA
 
+## How to cite us
+TBA
+
+---
+
+<img src="./img/PSN_logo.png" alt="PSNP logo" style="width:300px;height:auto;" align="left">
+<img src="./img/aulogo_uk_var2_blue.png" alt="Aarhus University logo" style="width:300px;auto;"align="right">
+<img src="./img/Carlsbergfondet_logo_2-liner_UK_RGB_GREEN.png" alt="Carlsberg Foundation logo" style="width:300px;height:auto;"align="center" >
 
