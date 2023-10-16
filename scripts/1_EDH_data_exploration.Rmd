@@ -461,3 +461,58 @@ https://edh.ub.uni-heidelberg.de/edh/inschrift/HD005863, list of 103 soldiers, C
 
 10. HD051713
 https://edh.ub.uni-heidelberg.de/edh/inschrift/HD051713, list of men, some of them called pater, some of them obitus/deceased, Building/foundation inscription from Municipium Claudium Virunum (Austria), 182 - 184 AD 
+
+
+## Women on inscriptions
+
+```{r}
+EDH_people %>% 
+  filter(gender == "female") -> EDHfem
+```
+
+```{r}
+EDHfem %>% 
+  count(findspot_ancient_clean, sort = T)
+```
+
+```{r} 
+# females from ancient Salona in Dalmatia
+
+EDHfem %>%
+  filter(findspot_ancient_clean %in% c("Salonae", "Salonae - 0a1")) -> SalonaFEM
+```
+
+
+```{r}
+SalonaFEM
+```
+
+```{r} 
+SalonaFEM %>% 
+  count(nomen_clean, sort=T)
+
+```
+
+```{r}
+SalonaFEM %>% 
+  count(total_age, sort=T)
+```
+
+
+```{r}
+# network from one inscription HD063871, 41 AD – 70 AD, Salonae, 14 people
+
+# TEXT
+# C(aius) Iulius Sceptus Admeti Aug(usti) lib(erti) [l]ib(ertus) IIIIIIvir Augustal(is) v(ivus) f(ecit) sibi et / Iuliae Coetonidi uxori / C(aio) Iulio C(ai ) f(ilio) Tro(mentina) Admeto f(ilio) / C(aio) I(ulio) C(ai) f(ilio) Tro(mentina) Aquilae f(ilio) / L(ucio) Iulio C(ai) f(ilio) Tro(mentina) Scepto f(ilio) / Iuliae C(ai) f(iliae) Tro(mentina) Admetidi f(iliae) // C(aio) Iulio |(mulieris) l(iberto) Tr[iu ]mphali f(ilio) / Iuliae C(ai) l(ibertae) Ro[m]anae f(iliae) / Iuliae |(mulieris) l(ibertae) S[ce]psidi f(iliae) / Iuliae |(mulieris) l(ibertae) Pr[im]ae uxori / defun[cta]e // Niso Ti(beri) Claudi Aug(usti) ser(vo) genero / defuncto / in h(oc) m(onumentum) veto aliter ossua / deponi quam Primae et nisi sunt // in fronte p(edes) XX i[na]gro p(edes) XXX
+
+
+
+```
+
+## Merchants on inscriptions
+
+```{r}
+EDH_people %>% 
+  filter(clean_text_interpretive_word == str_subset(clean_text_interpretive_word, "empor*")) 
+```
+
