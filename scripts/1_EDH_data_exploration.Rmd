@@ -516,3 +516,10 @@ EDH_people %>%
   filter(clean_text_interpretive_word == str_subset(clean_text_interpretive_word, "empor*")) 
 ```
 
+## Families
+```{r}
+
+EDH_people %>% 
+  filter(person_number_insc > 4 & person_number_insc< 10)
+```
+

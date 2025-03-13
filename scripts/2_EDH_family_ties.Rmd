@@ -72,6 +72,22 @@ edges <- as.matrix(sample)
 g <- graph_from_edgelist(edges, directed = FALSE)
 plot(g)
 ```
+```{r}
+#filter only one nomen
+ulpius_data <- EDH_people_nomen %>% 
+  filter(nomen_clean == "Ulpius")
+
+ulpius_data %>% 
+  filter(!is.na(nomen_clean)) %>% 
+  select(name, nomen_clean) -> ulpius
+
+ulpius %>% 
+  count(name, sort = T)
+
+ulp_edges <- as.matrix(ulpius)
+ulp <- graph_from_edgelist(ulp_edges, directed = TRUE)
+plot(ulp)
+```
 
 
 
